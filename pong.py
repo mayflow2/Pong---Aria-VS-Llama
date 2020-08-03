@@ -118,6 +118,8 @@ def move():
         pen.clear()
         pen.write("Aria: {}  Llama: {}".format(score_a, score_l), align="center", font=("Courier", 24, "normal"))
         winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+        win.update()
+        time.sleep(1)
 
     elif ball.xcor() < -390:
         ball.goto(0, 0)
@@ -126,6 +128,8 @@ def move():
         pen.clear()
         pen.write("Aria: {}  Llama: {}".format(score_a, score_l), align="center", font=("Courier", 24, "normal"))
         winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+        win.update()
+        time.sleep(1)
 
     elif ball.xcor() > 315 and ball.xcor() < 345 and ball.ycor() < llama.ycor() + 48 and ball.ycor() > llama.ycor() - 48 and ball.dx > 0:
         ball.dx *= -1
