@@ -1,157 +1,172 @@
-import turtle
+from turtle import Screen
+from turtle import Turtle
 import time
 import winsound
 
-# screen setup
-win = turtle.Screen()
-win.title("Pong - Aria VS Llama")
-win.bgcolor("black")
-win.setup(width=800, height=600)
-win.tracer(0)
-win.register_shape("llama.gif")
-win.register_shape("aria.gif")
+class Player():
+    def __init__(self, pic):
+        self.tur = Turtle()
+        self.score = 0
 
-# declare scores
-score_a = 0
-score_l = 0
+        self.tur.shape(pic)
+        self.tur.speed(0)
+        self.tur.penup()
 
-# aria
-aria = turtle.Turtle()
-aria.speed(0)
-aria.shape("aria.gif")
-aria.penup()
-aria.goto(-350, 0)
+    def incScore(self):
+        self.score += 1
 
-# llama
-llama = turtle.Turtle()
-llama.speed(0)
-llama.shape("llama.gif")
-llama.penup()
-llama.goto(350, 0)
+class Ball(Turtle):
+    def __init__(self, dx, dy):
+        self.tur = Turtle()
+        self.dx = dx
+        self.dy = dy
 
-# ball
-ball = turtle.Turtle()
-ball.speed(0)
-ball.shape("circle")
-ball.color("white")
-ball.penup()
-ball.goto(0, 0)
-ball.hideturtle()
-ball.dx = .4
-ball.dy = .4
+        self.tur.shape("circle")
+        self.tur.color("white")
+        self.tur.speed(0)
+        self.tur.penup()
+        self.tur.goto(0, 0)
 
-# writing
-pen = turtle.Turtle()
-pen.speed(0)
-pen.color("white")
-pen.penup()
-pen.hideturtle()
-pen.goto(-350, 110)
-pen.write("↑ w", align="center", font=("Courier", 24, "normal"))
-pen.goto(-350, 75)
-pen.write("↓ x", align="center", font=("Courier", 24, "normal"))
-pen.goto(340, 110)
-pen.write("↑ 9", align="center", font=("Courier", 24, "normal"))
-pen.goto(340, 75)
-pen.write("↓ 3", align="center", font=("Courier", 24, "normal"))
+class Writing(Turtle):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.speed(0)
+        self.color("white")
+        self.penup()
+        self.hideturtle()
 
-# countdown
-count = turtle.Turtle()
-count.speed(0)
-count.color("white")
-count.penup()
-count.hideturtle()
-count.goto(0, -100)
-
-# bind keys
+# define player moves
 def aria_up():
-    aria.sety(aria.ycor() + 20)
+    aria.tur.sety(aria.tur.ycor() + 20)
 def aria_down():
-    aria.sety(aria.ycor() - 20)
+    aria.tur.sety(aria.tur.ycor() - 20)
 
 def llama_up():
-    llama.sety(llama.ycor() + 20)
+    llama.tur.sety(llama.tur.ycor() + 20)
 def llama_down():
-    llama.sety(llama.ycor() - 20)
+    llama.tur.sety(llama.tur.ycor() - 20)
 
-win.listen()
-win.onkeypress(aria_up,'w')
-win.onkeypress(aria_down, 'x')
-win.onkeypress(llama_up,'9')
-win.onkeypress(llama_down, '3')
+def getScreen(ariaPic, llamaPic):
+    win = Screen()
+    win.title("Pong - Aria VS Llama")
+    win.bgcolor("black")
+    win.setup(width=800, height=600)
+    win.tracer(0)
+    win.register_shape(ariaPic)
+    win.register_shape(llamaPic)
 
-# countdown in action
-for i in range(5, 0, -1):
-    count.write(i, align="center", font=("Courier", 120, "bold"))
+    # bind keys with player moves
+    win.listen()
+    win.onkeypress(aria_up,'w')
+    win.onkeypress(aria_down, 'x')
+    win.onkeypress(llama_up,'9')
+    win.onkeypress(llama_down, '3')
+
+    return win
+
+def main():
+    # set up screen & players
+    global aria
+    global llama
+    win = getScreen("aria.gif", "llama.gif")
+    aria = Player("aria.gif")
+    aria.tur.goto(-350, 0)
+    llama = Player("llama.gif")
+    llama.tur.goto(350, 0)
+
+    # VS
+    vs = Writing()
+    vs.goto(0, -100)
+    vs.write("VS", align="center", font=("Courier", 120, "bold"))
     win.update()
-    time.sleep(1)
-    count.clear()
+    time.sleep(2)
+    vs.clear()
 
-ball.showturtle()
-pen.clear()
-pen.goto(0, 260)
-pen.write("Aria: 0  Llama: 0", align="center", font=("Courier", 24, "normal"))
+    # instructions
+    info = Writing()
+    info.goto(-350, 110)
+    info.write("↑ w", align="center", font=("Courier", 24, "normal"))
+    info.goto(-350, 75)
+    info.write("↓ x", align="center", font=("Courier", 24, "normal"))
+    info.goto(340, 110)
+    info.write("↑ 9", align="center", font=("Courier", 24, "normal"))
+    info.goto(340, 75)
+    info.write("↓ 3", align="center", font=("Courier", 24, "normal"))
 
-def move():
-    global score_a
-    global score_l
-
-    win.update()
-
-    ball.setx(ball.xcor() + ball.dx)
-    ball.sety(ball.ycor() + ball.dy)
-
-    if ball.ycor() > 290:
-        ball.sety(290)
-        ball.dy *= -1
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
-
-    elif ball.ycor() < -290:
-        ball.sety(-290)
-        ball.dy *= -1
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
-
-    elif ball.xcor() > 390:
-        ball.goto(0, 0)
-        ball.dx *= -1
-        score_a += 1
-        pen.clear()
-        pen.write("Aria: {}  Llama: {}".format(score_a, score_l), align="center", font=("Courier", 24, "normal"))
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+    # countdown
+    count = Writing()
+    count.goto(0, -100)
+    for i in range(5, 0, -1):
+        count.write(i, align="center", font=("Courier", 120, "bold"))
         win.update()
         time.sleep(1)
+        count.clear()
 
-    elif ball.xcor() < -390:
-        ball.goto(0, 0)
-        ball.dx *= -1
-        score_l += 1
-        pen.clear()
-        pen.write("Aria: {}  Llama: {}".format(score_a, score_l), align="center", font=("Courier", 24, "normal"))
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+    # set up ball & scoreboard
+    info.clear()
+    ball = Ball(.4, .4)
+    scoreBd = Writing()
+    scoreBd.goto(0, 260)
+    scoreBd.write("Aria: 0  Llama: 0", align="center", font=("Courier", 24, "normal"))
+    
+    # game loop
+    while(aria.score + llama.score) < 5:
         win.update()
-        time.sleep(1)
 
-    elif ball.xcor() > 315 and ball.xcor() < 345 and ball.ycor() < llama.ycor() + 48 and ball.ycor() > llama.ycor() - 48 and ball.dx > 0:
-        ball.dx *= -1
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+        ball.tur.setx(ball.tur.xcor() + ball.dx)
+        ball.tur.sety(ball.tur.ycor() + ball.dy)
 
-    elif ball.xcor() < -320 and ball.xcor() > -350 and ball.ycor() < aria.ycor() + 48 and ball.ycor() > aria.ycor() - 48 and ball.dx < 0:
-        ball.dx *= -1
-        winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+        if ball.tur.ycor() > 290:
+            ball.tur.sety(290)
+            ball.dy *= -1
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
 
-while (score_a + score_l) < 5:
-    move() 
+        elif ball.tur.ycor() < -290:
+            ball.tur.sety(-290)
+            ball.dy *= -1
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
 
-ball.hideturtle()
-pen.goto(100, 0)
-pen.color("cyan")
-pen.write("WINS!!!", align="center", font=("Courier", 60, "bold"))
-if score_a > score_l:
-    llama.hideturtle()
-    aria.goto(-200, 60)
-else:
-    aria.hideturtle()
-    llama.goto(-200, 60)
-win.update()
+        elif ball.tur.xcor() > 390:
+            ball.tur.goto(0, 0)
+            ball.dx *= -1
+            aria.incScore()
+            scoreBd.clear()
+            scoreBd.write("Aria: {}  Llama: {}".format(aria.score, llama.score), align="center", font=("Courier", 24, "normal"))
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+            win.update()
+            time.sleep(1)
 
-win.mainloop()       
+        elif ball.tur.xcor() < -390:
+            ball.tur.goto(0, 0)
+            ball.dx *= -1
+            llama.incScore()
+            scoreBd.clear()
+            scoreBd.write("Aria: {}  Llama: {}".format(aria.score, llama.score), align="center", font=("Courier", 24, "normal"))
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+            win.update()
+            time.sleep(1)
+
+        elif ball.tur.xcor() > 315 and ball.tur.xcor() < 345 and ball.tur.ycor() < llama.tur.ycor() + 48 and ball.tur.ycor() > llama.tur.ycor() - 48 and ball.dx > 0:
+            ball.dx *= -1
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+
+        elif ball.tur.xcor() < -320 and ball.tur.xcor() > -350 and ball.tur.ycor() < aria.tur.ycor() + 48 and ball.tur.ycor() > aria.tur.ycor() - 48 and ball.dx < 0:
+            ball.dx *= -1
+            winsound.PlaySound("bounce.wav", winsound.SND_ASYNC)
+
+    # announce winner
+    ball.tur.hideturtle()
+    info.goto(100, 0)
+    info.color("cyan")
+    info.write("WINS!!!", align="center", font=("Courier", 60, "bold"))
+    if aria.score > llama.score:
+        llama.tur.hideturtle()
+        aria.tur.goto(-200, 60)
+    else:
+        aria.tur.hideturtle()
+        llama.tur.goto(-200, 60)
+    win.update()
+    win.mainloop()
+
+if __name__ == "__main__":
+    main()
